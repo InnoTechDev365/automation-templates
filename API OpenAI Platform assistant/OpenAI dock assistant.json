@@ -1,0 +1,172 @@
+{
+  "name": "OpenAI dock assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "<__PLACEHOLDER_VALUE__YOUR_ASSISTANT_ID__>",
+          "mode": "list"
+        },
+        "prompt": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        448,
+        208
+      ],
+      "id": "e29b93b0-a330-4e20-aa3a-1b2f612d4cfc",
+      "name": "Message a model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.from.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        816
+      ],
+      "id": "abdd1392-ecd4-4cf9-983c-0909789e0e5f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Receives messages').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        464
+      ],
+      "id": "368a74a6-0dd9-4081-a742-1498a36013a7",
+      "name": "Send a text message",
+      "webhookId": "a36fd822-bc25-418d-a179-040a756e70d8",
+      "credentials": {
+        "telegramApi": {
+          "id": "W5lptGRpYSWiy5vj",
+          "name": "Sushi tmei"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        464
+      ],
+      "id": "3683bedf-b45e-430c-a46a-5572d25b9638",
+      "name": "Receives messages",
+      "webhookId": "36078130-50fe-479b-9e1f-1079a604f8fd"
+    },
+    {
+      "parameters": {
+        "content": "STEP 1: CREATE OPENAI ASSISTANT\n\n1. Go to platform.openai.com/assistants\n2. Click Create Assistant\n3. Configure your assistant:\n   - Name: Choose a descriptive name\n   - Model: Select gpt-4o, gpt-4-turbo, or gpt-3.5-turbo\n   - Instructions: Define behavior and personality\n   - Tools: Enable if needed (Code Interpreter, File Search)\n   - Files: Upload knowledge base if needed\n\n4. Copy the Assistant ID (starts with asst_)\n5. Keep this ID for the next step",
+        "height": 556,
+        "color": 2
+      },
+      "id": "653562f0-f9cb-4939-a531-50ae3f062cd4",
+      "name": "Step 1: Setup OpenAI Assistant",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "content": "STEP 4: TESTING\n\n1. Activate the workflow (toggle switch)\n2. Open Telegram and find your bot\n3. Send a test message\n4. Wait for the assistant response\n5. Send multiple messages to test conversation memory\n6. Each user gets their own conversation thread\n\nIf no response:\n- Check workflow execution log\n- Verify credentials are correct\n- Ensure Assistant ID is valid",
+        "height": 400,
+        "color": 5
+      },
+      "id": "04985b54-12c4-4b46-a745-1bb1530aa181",
+      "name": "Step 4: Test the Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        864,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "content": "HOW THIS WORKFLOW WORKS:\n\n1. User sends message to Telegram bot\n2. Trigger receives the message\n3. Message sent to OpenAI Assistant\n4. Memory stores conversation per user ID\n5. Assistant generates response\n6. Response sent back to user via Telegram\n\nKEY FEATURES:\n- Conversation memory per user\n- Uses your custom OpenAI Assistant\n- Automatic message handling",
+        "height": 640
+      },
+      "id": "64c4f816-6959-4095-a9e8-92de5a31e4a0",
+      "name": "How It Works",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        752
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receives messages": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "83b6b42c-6c57-4bce-8eed-d43cdb980b6a",
+  "meta": {
+    "instanceId": "b950bc4ae6eee7a0c218a5fb848142bcbbed3ddf913e536cc3a34be4bc1b6d66"
+  },
+  "id": "dVQspjfFELtWg8e_uMmUm",
+  "tags": []
+}
